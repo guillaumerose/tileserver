@@ -34,12 +34,20 @@ var simple = {
             }
         }, {
             "id": "water",
-            "type": "line",
+            "type": "fill",
             "source": "osm",
             "source-layer": "water",
             "paint": {
-              "line-color": "#000000",
-              "line-width": 2
+                "fill-color": "#aad4f3"
+            }
+        }, {
+            "id": "highway",
+            "type": "line",
+            "source": "osm",
+            "source-layer": "highway",
+            "paint": {
+                "line-color": "#000000",
+                "line-width": 2
             }
         }, {
             "id": "building",
@@ -47,7 +55,7 @@ var simple = {
             "source": "osm",
             "source-layer": "building",
             "paint": {
-                "fill-color": "#3887be"
+                "fill-color": "#969696"
             }
         }
     ]

@@ -24,11 +24,17 @@ public class TileFactory {
 
     public byte[] create(BoundingBox bbox, boolean buidings) {
         VectorTileEncoder encoder = new VectorTileEncoder();
-        Osmonaut osmonaut = new Osmonaut("/home/grose/projets/github/vector-tiles/2819.osm.pbf", new EntityFilter(false, true, false));
+        Osmonaut osmonaut = new Osmonaut("/home/grose/projets/github/vector-tiles/1409.osm.pbf", new EntityFilter(false, true, false));
         osmonaut.scan(new IOsmonautReceiver() {
             @Override
             public boolean needsEntity(EntityType type, Tags tags) {
-                return (buidings && tags.hasKeyValue("building", "yes")) || tags.hasKey("highway") || tags.hasKey("waterway") || tags.hasKeyValue("leisure", "park");
+                return (buidings && tags.hasKeyValue("building", "yes"))
+                        || tags.hasKey("highway")
+                        || tags.hasKey("waterway")
+                        || tags.hasKeyValue("natural", "water")
+                        || tags.hasKeyValue("landuse", "forest")
+                        || tags.hasKeyValue("landuse", "grass")
+                        || tags.hasKeyValue("leisure", "park");
             }
 
             @Override
@@ -39,8 +45,10 @@ public class TileFactory {
                         .collect(toList());
                 Map<String, String> attributes = new HashMap<>();
                 encoder.addFeature(
-                        entity.getTags().hasKeyValue("leisure", "park") ? "park"
-                                : entity.getTags().hasKeyValue("building", "yes") ? "building" : entity.getTags().hasKey("waterway") ? "water" : "highway",
+                        entity.getTags().hasKeyValue("landuse", "forest") ? "wood"
+                                : (entity.getTags().hasKeyValue("landuse", "grass") || entity.getTags().hasKeyValue("leisure", "park")) ? "park"
+                                        : entity.getTags().hasKeyValue("building", "yes") ? "building"
+                                                : (entity.getTags().hasKeyValue("natural", "water") || entity.getTags().hasKey("waterway")) ? "water" : "highway",
                         attributes,
                         line(coordinates));
             }

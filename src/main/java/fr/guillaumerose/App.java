@@ -11,20 +11,15 @@ public class App {
         get("/data/osm2vectortiles/:z/:x/:y", (req, res) -> {
             try {
                 System.out.println(req.params());
-                String zoom = req.params().get(":z");
-                String x = req.params().get(":x");
-                String y = req.params().get(":y");
+                int zoom = Integer.valueOf(req.params().get(":z"));
+                int x = Integer.valueOf(req.params().get(":x"));
+                int y = Integer.valueOf(req.params().get(":y"));
 
-                if (zoom.equals("14") &&
-                        ((x.equals("8294") && (y.equals("5638") || y.equals("5639")))
-                                || (x.equals("8295") && (y.equals("5638") || y.equals("5639"))))) {
+                if ((zoom == 12 && x == 2073 && y == 1409)
+                        || (zoom == 13 && x >= 2 * 2073 && x <= 2 * 2073 + 1 && y >= 2 * 1409 && y <= 2 * 1409 + 1)
+                        || (zoom == 14 && x >= 4 * 2073 && x <= 4 * 2073 + 3 && y >= 4 * 1409 && y <= 4 * 1409 + 3)) {
                     res.header("Content-Type", "application/x-protobuf");
-                    return factory.create(BoundingBox.create(14, Integer.valueOf(x), Integer.valueOf(y)), true);
-                }
-                else if (zoom.equals("13") && x.equals("4147") && y.equals("2819")) {
-                    res.header("Content-Type", "application/x-protobuf");
-                    System.out.println("WOOT");
-                    return factory.create(BoundingBox.create(13, 4147, 2819), false);
+                    return factory.create(BoundingBox.create(zoom, x, y), zoom >= 14);
                 }
                 else {
                     res.status(404);

@@ -26,15 +26,15 @@
       <artifactId>spark-core</artifactId>
       <version>2.5</version>
     </dependency>
+<dependency>
+  <groupId>com.github.davidmoten</groupId>
+  <artifactId>rtree</artifactId>
+  <version>0.8-RC10</version>
+</dependency>
     <dependency>
       <groupId>no.ecc.vectortile</groupId>
       <artifactId>java-vector-tile</artifactId>
       <version>1.2.1</version>
-    </dependency>
-    <dependency>
-      <groupId>com.github.MorbZ</groupId>
-      <artifactId>OSMonaut</artifactId>
-      <version>92360193001dd26b1defb916d74ad1b5661967f9</version>
     </dependency>
     <dependency>
       <groupId>org.projectlombok</groupId>
@@ -75,10 +75,6 @@
     <repository>
       <id>ECC</id>
       <url>https://github.com/ElectronicChartCentre/ecc-mvn-repo/raw/master/releases</url>
-    </repository>
-    <repository>
-      <id>jitpack.io</id>
-      <url>https://jitpack.io</url>
     </repository>
   </repositories>
 </project>

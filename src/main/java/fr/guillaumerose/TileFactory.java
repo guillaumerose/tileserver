@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.openstreetmap.osmosis.core.container.v0_6.EntityContainer;
 import org.openstreetmap.osmosis.core.domain.v0_6.Node;
@@ -13,6 +14,10 @@ import org.openstreetmap.osmosis.core.domain.v0_6.WayNode;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 import org.openstreetmap.osmosis.pbf2.v0_6.PbfReader;
 
+import com.github.davidmoten.rtree.Entry;
+import com.github.davidmoten.rtree.RTree;
+import com.github.davidmoten.rtree.geometry.Geometries;
+import com.github.davidmoten.rtree.geometry.Geometry;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.GeometryFactory;
 
@@ -20,27 +25,32 @@ import no.ecc.vectortile.VectorTileEncoder;
 
 public class TileFactory {
 	private static final GeometryFactory geometryFactory = new GeometryFactory();
-	private final List<double[]> ways = read();
+	private final RTree<double[], Geometry> tree = read();
 
 	public byte[] create(BoundingBox bbox, boolean buidings) {
 		VectorTileEncoder encoder = new MyEncoder(4096, 8, true);
 		Map<String, String> attributes = new HashMap<>();
-		for (double[] way : ways) {
+		Iterable<Entry<double[], Geometry>> found = tree.search(bbox.rectangle()).toBlocking().toIterable();
+		AtomicInteger counter = new AtomicInteger(0);
+		found.forEach(en -> {
+			double[] way = en.value();
 			Coordinate[] array = new Coordinate[way.length / 2];
 			for (int i = 0; i < array.length; i++) {
 				array[i] = new Coordinate(bbox.relativeLon(way[2 * i]), bbox.relativeLat(way[2 * i + 1]));
 			}
 			try {
-				encoder.addFeature("building", attributes,
+				encoder.addFeature("water", attributes,
 						geometryFactory.createPolygon(geometryFactory.getCoordinateSequenceFactory().create(array)));
 			} catch (Exception e) {
 				System.out.println("Cannot add building");
 			}
-		}
+			counter.incrementAndGet();
+		});
+		System.out.println(counter.get() + "/" + tree.size());
 		return encoder.encode();
 	}
 
-	private List<double[]> read() {
+	private RTree<double[], Geometry> read() {
 		Map<Long, double[]> nodes = new HashMap<>();
 		List<double[]> ways = new ArrayList<>();
 		String filename = "/home/guillaume/projets/osrm-tests/1409.osm.pbf";
@@ -67,7 +77,7 @@ public class TileFactory {
 					break;
 				case Way:
 					Way way = (Way) container.getEntity();
-					if (way.getTags().stream().anyMatch(w -> w.getKey().equals("building"))) {
+					if (way.getTags().stream().anyMatch(w -> w.getKey().equals("waterway"))) {
 						double[] coordinates = new double[2 * way.getWayNodes().size()];
 						int i = 0;
 						for (WayNode wn : way.getWayNodes()) {
@@ -85,7 +95,25 @@ public class TileFactory {
 			}
 		});
 		reader.run();
+		RTree<double[], Geometry> tree = RTree.create();
+		for (double[] coordinates : ways) {
+			double minLat = coordinates[1];
+			double maxLat = coordinates[1];
+			double minLon = coordinates[0];
+			double maxLon = coordinates[0];
+			for (int i = 0; i < coordinates.length; i++) {
+				if (i % 2 == 0) {
+					minLon = Math.min(minLon, coordinates[i]);
+					maxLon = Math.max(maxLon, coordinates[i]);
+				} else {
+					minLat = Math.min(minLat, coordinates[i]);
+					maxLat = Math.max(maxLat, coordinates[i]);
+				}
+			}
+			tree = tree.add(coordinates, Geometries.rectangleGeographic(minLon, minLat, maxLon, maxLat));
+		}
+		tree.visualize(600, 600).save("target/mytree.png");
 		System.out.println("Loading OK");
-		return ways;
+		return tree;
 	}
 }

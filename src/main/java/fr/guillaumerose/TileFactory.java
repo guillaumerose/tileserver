@@ -22,6 +22,7 @@ public class TileFactory {
         AtomicInteger counter = new AtomicInteger(0);
         tree.search(bbox).forEach(stored -> {
             if (buidings || !stored.getLayer().equals("building")) {
+                attributes.put("name", stored.getName());
                 encoder.addFeature(stored.getLayer(), attributes, linestring(bbox, stored));
                 counter.incrementAndGet();
             }

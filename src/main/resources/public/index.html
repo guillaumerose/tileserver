@@ -22,11 +22,12 @@ var simple = {
         "osm": {
             "type": "vector",
             "tiles": [
-                "http://localhost:9090/data/osm2vectortiles/{z}/{x}/{y}"
+                "http://" + window.location.hostname + ":9090/data/osm2vectortiles/{z}/{x}/{y}"
             ],
             "maxzoom": 14
         }
     },
+    "glyphs": "https://raw.githubusercontent.com/osm2vectortiles/mapbox-gl-styles/master/glyphs/{fontstack}/{range}.pbf",
     "layers": [
         {
             "id": "background",
@@ -118,6 +119,43 @@ var simple = {
                     ]
                 },
                 "fill-outline-color": "hsl(35, 6%, 79%)"
+            }
+        },
+        {
+            "id": "highway-name",
+            "type": "symbol",
+            "source": "osm",
+            "source-layer": "highway",
+            "layout": {
+                "symbol-placement": "line",
+                "symbol-spacing": 250,
+                "text-field": "{name}",
+                "text-font": [
+                    "Open Sans Semibold"
+                ],
+                "text-size": 9
+            },
+            "paint": {
+                "text-halo-color": "#fff",
+                "text-halo-width": 1.5
+            }
+        },
+        {
+            "id": "building-name",
+            "type": "symbol",
+            "source": "osm",
+            "source-layer": "building",
+            "layout": {
+                "symbol-spacing": 250,
+                "text-field": "{name}",
+                "text-font": [
+                    "Open Sans Semibold"
+                ],
+                "text-size": 9
+            },
+            "paint": {
+                "text-halo-color": "#fff",
+                "text-halo-width": 1.5
             }
         }
     ]

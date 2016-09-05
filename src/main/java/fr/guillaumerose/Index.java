@@ -14,8 +14,8 @@ public class Index {
         this.tree = RTree.create();
     }
 
-    public synchronized void index(String layer, float[] coordinates) {
-        StoredPolygon stored = new StoredPolygon(layer, coordinates);
+    public synchronized void index(String layer, String name, float[] coordinates) {
+        StoredPolygon stored = new StoredPolygon(layer, name, coordinates);
         tree = tree.add(stored, stored.rectangle());
     }
 
@@ -30,6 +30,7 @@ public class Index {
     @Data
     public static class StoredPolygon {
         private final String layer;
+        private final String name;
         private final float[] coordinates;
 
         public Rectangle rectangle() {

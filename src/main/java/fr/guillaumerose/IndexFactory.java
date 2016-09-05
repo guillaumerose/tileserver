@@ -12,6 +12,8 @@ import org.openstreetmap.osmosis.core.domain.v0_6.WayNode;
 import org.openstreetmap.osmosis.core.task.v0_6.Sink;
 import org.openstreetmap.osmosis.pbf2.v0_6.PbfReader;
 
+import static java.util.stream.Collectors.*;
+
 public class IndexFactory {
     private final String filename = "/home/grose/projets/github/vector-tiles/1409.osm.pbf";
 
@@ -39,22 +41,21 @@ public class IndexFactory {
                         break;
                     case Way:
                         Way way = (Way) container.getEntity();
-                        if (way.getTags().stream().anyMatch(w -> w.getKey().equals("building")) && isPolygon(way)) {
-                            index.index("building", coordinates(nodes, way));
+                        Map<String, String> tags = way.getTags().stream().collect(toMap(t -> t.getKey(), t -> t.getValue()));
+                        if (tags.containsKey("building") && isPolygon(way)) {
+                            index.index("building", tags.get("name"), coordinates(nodes, way));
                         }
-                        else if (way.getTags().stream().anyMatch(w -> w.getKey().equals("waterway")
-                                || (w.getKey().equals("natural") && w.getValue().equals("water"))) && isPolygon(way)) {
-                            index.index("water", coordinates(nodes, way));
+                        else if ((tags.containsKey("waterway") || "water".equals(tags.get("natural"))) && isPolygon(way)) {
+                            index.index("water", tags.get("name"), coordinates(nodes, way));
                         }
-                        else if (way.getTags().stream().anyMatch(w -> w.getKey().equals("highway"))) {
-                            index.index("highway", coordinates(nodes, way));
+                        else if (tags.containsKey("highway")) {
+                            index.index("highway", tags.get("name"), coordinates(nodes, way));
                         }
-                        else if (way.getTags().stream().anyMatch(w -> (w.getKey().equals("natural") && w.getValue().equals("wood"))
-                                || (w.getKey().equals("landuse") && w.getValue().equals("forest"))) && isPolygon(way)) {
-                            index.index("wood", coordinates(nodes, way));
+                        else if (("wood".equals(tags.get("natural")) || "forest".equals(tags.get("landuse"))) && isPolygon(way)) {
+                            index.index("wood", tags.get("name"), coordinates(nodes, way));
                         }
-                        else if (way.getTags().stream().anyMatch(w -> w.getKey().equals("leisure") && w.getValue().equals("park")) && isPolygon(way)) {
-                            index.index("park", coordinates(nodes, way));
+                        else if ("park".equals(tags.get("leisure")) && isPolygon(way)) {
+                            index.index("park", tags.get("name"), coordinates(nodes, way));
                         }
                         break;
                     default:

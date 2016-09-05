@@ -21,7 +21,9 @@ var simple = {
     "sources": {
         "osm": {
             "type": "vector",
-            "tiles": ["http://localhost:9090/data/osm2vectortiles/{z}/{x}/{y}"],
+            "tiles": [
+                "http://localhost:9090/data/osm2vectortiles/{z}/{x}/{y}"
+            ],
             "maxzoom": 14
         }
     },
@@ -29,10 +31,24 @@ var simple = {
         {
             "id": "background",
             "type": "background",
+            "layout": {},
             "paint": {
-                "background-color": "#ffffff"
+                "background-color": {
+                    "base": 1,
+                    "stops": [
+                        [
+                            11,
+                            "hsl(35, 32%, 91%)"
+                        ],
+                        [
+                            13,
+                            "hsl(35, 12%, 89%)"
+                        ]
+                    ]
+                }
             }
-        }, {
+        },
+        {
             "id": "water",
             "type": "fill",
             "source": "osm",
@@ -40,7 +56,8 @@ var simple = {
             "paint": {
                 "fill-color": "#aad4f3"
             }
-        }, {
+        },
+        {
             "id": "wood",
             "type": "fill",
             "source": "osm",
@@ -48,7 +65,8 @@ var simple = {
             "paint": {
                 "fill-color": "#b5e194"
             }
-        }, {
+        },
+        {
             "id": "park",
             "type": "fill",
             "source": "osm",
@@ -56,7 +74,8 @@ var simple = {
             "paint": {
                 "fill-color": "#C5EB8D"
             }
-        }, {
+        },
+        {
             "id": "highway",
             "type": "line",
             "source": "osm",
@@ -65,13 +84,40 @@ var simple = {
                 "line-color": "#000000",
                 "line-width": 2
             }
-        }, {
+        },
+        {
             "id": "building",
             "type": "fill",
             "source": "osm",
             "source-layer": "building",
             "paint": {
-                "fill-color": "#969696"
+                "fill-color": {
+                    "base": 1,
+                    "stops": [
+                        [
+                            15,
+                            "hsl(35, 11%, 88%)"
+                        ],
+                        [
+                            16,
+                            "hsl(35, 8%, 85%)"
+                        ]
+                    ]
+                },
+                "fill-opacity": {
+                    "base": 1,
+                    "stops": [
+                        [
+                            15.5,
+                            0
+                        ],
+                        [
+                            16,
+                            1
+                        ]
+                    ]
+                },
+                "fill-outline-color": "hsl(35, 6%, 79%)"
             }
         }
     ]

@@ -42,11 +42,19 @@ public class IndexFactory {
                         if (way.getTags().stream().anyMatch(w -> w.getKey().equals("building")) && isPolygon(way)) {
                             index.index("building", coordinates(nodes, way));
                         }
-                        else if (way.getTags().stream().anyMatch(w -> w.getKey().equals("waterway")) && isPolygon(way)) {
+                        else if (way.getTags().stream().anyMatch(w -> w.getKey().equals("waterway")
+                                || (w.getKey().equals("natural") && w.getValue().equals("water"))) && isPolygon(way)) {
                             index.index("water", coordinates(nodes, way));
                         }
                         else if (way.getTags().stream().anyMatch(w -> w.getKey().equals("highway"))) {
                             index.index("highway", coordinates(nodes, way));
+                        }
+                        else if (way.getTags().stream().anyMatch(w -> (w.getKey().equals("natural") && w.getValue().equals("wood"))
+                                || (w.getKey().equals("landuse") && w.getValue().equals("forest"))) && isPolygon(way)) {
+                            index.index("wood", coordinates(nodes, way));
+                        }
+                        else if (way.getTags().stream().anyMatch(w -> w.getKey().equals("leisure") && w.getValue().equals("park")) && isPolygon(way)) {
+                            index.index("park", coordinates(nodes, way));
                         }
                         break;
                     default:

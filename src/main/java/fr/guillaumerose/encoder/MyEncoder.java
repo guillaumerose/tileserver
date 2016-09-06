@@ -112,7 +112,7 @@ public class MyEncoder {
             }
         }
         else {
-            // geometry = clipGeometry(geometry);
+            geometry = clipGeometry(geometry);
         }
 
         // if clipping result in MultiPolygon, then split once more

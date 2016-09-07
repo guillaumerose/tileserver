@@ -96,28 +96,30 @@ public class MyEncoder {
      * @param attributes
      * @param geometry
      */
-    public void addFeature(String layerName, Map<String, ?> attributes, Geometry geometry) {
+    public void addFeature(String layerName, Map<String, ?> attributes, Geometry geometry, boolean clip) {
         // split up MultiPolygon and GeometryCollection (without subclasses)
         if (geometry instanceof MultiPolygon || geometry.getClass().equals(GeometryCollection.class)) {
-            splitAndAddFeatures(layerName, attributes, (GeometryCollection) geometry);
+            splitAndAddFeatures(layerName, attributes, (GeometryCollection) geometry, clip);
             return;
         }
 
         // skip small Polygon/LineString.
 
         // clip geometry
-        if (geometry instanceof Point) {
-            if (!clipCovers(geometry)) {
-                return;
+        if (clip) {
+            if (geometry instanceof Point) {
+                if (!clipCovers(geometry)) {
+                    return;
+                }
             }
-        }
-        else {
-            geometry = clipGeometry(geometry);
+            else {
+                geometry = clipGeometry(geometry);
+            }
         }
 
         // if clipping result in MultiPolygon, then split once more
         if (geometry instanceof MultiPolygon || geometry.getClass().equals(GeometryCollection.class)) {
-            splitAndAddFeatures(layerName, attributes, (GeometryCollection) geometry);
+            splitAndAddFeatures(layerName, attributes, (GeometryCollection) geometry, clip);
             return;
         }
 
@@ -194,10 +196,10 @@ public class MyEncoder {
         }
     }
 
-    private void splitAndAddFeatures(String layerName, Map<String, ?> attributes, GeometryCollection geometry) {
+    private void splitAndAddFeatures(String layerName, Map<String, ?> attributes, GeometryCollection geometry, boolean clip) {
         for (int i = 0; i < geometry.getNumGeometries(); i++) {
             Geometry subGeometry = geometry.getGeometryN(i);
-            addFeature(layerName, attributes, subGeometry);
+            addFeature(layerName, attributes, subGeometry, clip);
         }
     }
 

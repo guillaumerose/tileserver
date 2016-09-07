@@ -19,7 +19,7 @@ public class TileFactory {
         tree.search(bbox).forEach(stored -> {
             if (buidings || !stored.getLayer().equals("building")) {
                 attributes.put("name", stored.getName());
-                encoder.addFeature(stored.getLayer(), attributes, stored.geometry(bbox));
+                encoder.addFeature(stored.getLayer(), attributes, stored.geometry(bbox), stored.isClip());
                 counter.incrementAndGet();
             }
         });

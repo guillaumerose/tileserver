@@ -12,6 +12,10 @@ public class App {
             try {
                 System.out.println(req.params());
                 int zoom = Integer.valueOf(req.params().get(":z"));
+                if (zoom < 10) {
+                    res.status(404);
+                    return "Too high";
+                }
                 int x = Integer.valueOf(req.params().get(":x"));
                 int y = Integer.valueOf(req.params().get(":y"));
 
@@ -20,7 +24,8 @@ public class App {
             }
             catch (Exception e) {
                 e.printStackTrace();
-                return null;
+                res.status(500);
+                return "Server error";
             }
         });
 
